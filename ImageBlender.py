@@ -12,11 +12,12 @@ class ImageBlender:
         """
         pass
 
-    def create_rectangular_mask(self, mask_width, mask_height, mask_coordinates):
+    def create_rectangular_mask(self, mask_size, mask_coordinates):
         """
-        Return a WHITE rectangular image of size 'mask_width' by 'mask_height' and
+        Return a WHITE image of size 'mask_size' and
         a BLACK region located at 'mask_coordinates'.
 
+        'mask_size' is a tuple (width, height)
         'mask_coordinates' is a tuple (x, y, width, height).
         """
         pass

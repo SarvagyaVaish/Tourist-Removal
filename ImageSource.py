@@ -4,9 +4,11 @@ import re
 
 
 class ImageSource:
+
     def __init__(self):
         self.primary_image = None
         self.secondary_images = []
+
 
     def load_images(self, folder_path):
         """
@@ -42,9 +44,20 @@ class ImageSource:
         # is not [] is only necessary if you want the boolean and not the falsy/truthy value
         return self.primary_image is not None and self.secondary_images is not []
 
+
     # Added to sort the files for 1 vs 01 vs 10, etc
     # Taken from https://stackoverflow.com/qsuestions/11150239/python-natural-sorting
     def __natural_sort(self, l):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
         alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
         return sorted(l, key = alphanum_key)
+
+
+    def get_primary_image(self):
+        return self.primary_image
+
+
+    def get_secondary_image(self, index):
+        if index < len(self.secondary_images):
+            return self.secondary_images[index]
+        return None
