@@ -2,6 +2,7 @@ from CommandLineExecutor import CommandLineExecutor
 from ImageAligner import ImageAligner
 from ImageBlender import ImageBlender
 from ImageSource import ImageSource
+import cv2
 
 class AppInstance:
     """
@@ -31,18 +32,19 @@ class AppInstance:
         primary_image = self.image_source.get_primary_image()
         secondary_image = self.image_source.get_secondary_image(secondary_image_index)
 
-        if primary_image == None or secondary_image == None:
+        if primary_image is None or secondary_image is None:
             print "[ERROR] AppInstance::align_nth_secondary_image() - primary or secondary image is None"
             return
 
-        result_image = self.image_aligner.align_image(primary_image, secondary_image)
+        aligned_image = self.image_aligner.align_image(primary_image, secondary_image)
+        self.image_source.set_aligned_secondary_image(aligned_image, secondary_image_index)
 
 
     def blend_nth_secondary_image(self, secondary_image_index, x, y, width, height):
         primary_image = self.image_source.get_primary_image()
-        secondary_image = self.image_source.get_secondary_image(secondary_image_index)
+        secondary_image = self.image_source.get_aligned_secondary_image(secondary_image_index)
 
-        if primary_image == None or secondary_image == None:
+        if primary_image is None or secondary_image is None:
             print "[ERROR] AppInstance::blend_nth_secondary_image() - primary or secondary image is None"
             return
 
@@ -50,6 +52,7 @@ class AppInstance:
         mask_coordinates = (x, y, width, height)
 
         mask = self.image_blender.create_rectangular_mask(mask_size, mask_coordinates)
+
         result_image = self.image_blender.blend(primary_image, secondary_image, mask)
 
 

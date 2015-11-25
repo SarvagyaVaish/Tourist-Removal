@@ -8,6 +8,7 @@ class ImageSource:
     def __init__(self):
         self.primary_image = None
         self.secondary_images = []
+        self.aligned_secondary_images = {}
 
 
     def load_images(self, folder_path):
@@ -57,7 +58,29 @@ class ImageSource:
         return self.primary_image
 
 
+    def get_number_of_secondary_images(self):
+        return len(self.secondary_images)
+
+
     def get_secondary_image(self, index):
         if index < len(self.secondary_images):
             return self.secondary_images[index]
         return None
+
+
+    def set_aligned_secondary_image(self, image, index):
+        self.aligned_secondary_images[index] = image
+
+
+    def get_aligned_secondary_image(self, index):
+        # Boundary checking on index
+        if index not in range(len(self.secondary_images)):
+            return None
+
+        # If the aligned secondary image does not exist, return None
+        if index not in self.aligned_secondary_images:
+            return None
+
+        return self.aligned_secondary_images[index]
+
+
