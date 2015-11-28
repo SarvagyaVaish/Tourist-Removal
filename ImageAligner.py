@@ -64,7 +64,7 @@ def warpImagePair(image_1, image_2, homography):
     translation_matrix = np.array([[1, 0, -1 * x_min], [0, 1, -1 * y_min], [0, 0, 1]])
     translated_homography = np.dot(translation_matrix, homography)
 
-    return cv2.warpPerspective(image_1, translated_homography, (x_max - x_min, y_max - y_min))
+    return cv2.warpPerspective(image_1, translated_homography, (x_max - x_min, y_max - y_min)), [-1 * x_min, -1 * y_min]
 
 
 class ImageAligner:
@@ -84,5 +84,18 @@ class ImageAligner:
         """
         secondary_kp, primary_kp, matches = find_matches_between_images(secondary_image, primary_image, 50)
         homography = find_homography(secondary_kp, primary_kp, matches)
-        return warpImagePair(secondary_image, primary_image, homography)
+        warped, point = warpImagePair(secondary_image, primary_image, homography)
 
+        padding = 20
+        # Creates an image that is the same shape as the primary with padding on each side, just in case.
+        cropped_and_padded = np.zeros((primary_image.shape[0] + 2 * padding, primary_image.shape[1] + 2 * padding, 3))
+
+        # Sets the corners, may need to write some tests for this.
+        top_left = 0 if point[1] < padding else point[1] - padding
+        top_right = primary_image.shape[0] + padding - 1
+        bottom_left = 0 if point[0] < padding else point[0] - padding
+        bottom_right = primary_image.shape[1] + padding
+
+        # Sets the indexes in the cropped and padded to the returned value
+        cropped_and_padded[top_left: top_right, bottom_left: bottom_right] = warped[top_left: top_right, bottom_left: bottom_right];
+        return cropped_and_padded
