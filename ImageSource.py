@@ -10,6 +10,9 @@ class ImageSource:
         self.secondary_images = []
         self.aligned_secondary_images = {}
 
+        # Intermediate result image
+        self.result_image = None
+
 
     def load_images(self, folder_path):
         """
@@ -84,3 +87,12 @@ class ImageSource:
         return self.aligned_secondary_images[index]
 
 
+    def get_result_image(self):
+        if self.result_image is None:
+            return self.primary_image
+        else:
+            return self.result_image
+
+
+    def set_result_image(self, new_result_image):
+        self.result_image = new_result_image

@@ -4,6 +4,8 @@ from ImageBlender import ImageBlender
 from ImageSource import ImageSource
 import cv2
 
+DISPLAY_INTERMEDIATE_RESULTS = 1
+
 class AppInstance:
     """
     Class to bind everything together.
@@ -39,33 +41,49 @@ class AppInstance:
         aligned_image = self.image_aligner.align_image(primary_image, secondary_image)
         self.image_source.set_aligned_secondary_image(aligned_image, secondary_image_index)
 
+        if DISPLAY_INTERMEDIATE_RESULTS:
+            window_title = "Intermediate Aligning Result (#" + str(secondary_image_index) + ")"
+            cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
+            cv2.imshow(window_title, aligned_image)
+
 
     def blend_nth_secondary_image(self, secondary_image_index, x, y, width, height):
-        primary_image = self.image_source.get_primary_image()
+        previous_result_image = self.image_source.get_result_image()
         secondary_image = self.image_source.get_aligned_secondary_image(secondary_image_index)
 
-        if primary_image is None or secondary_image is None:
+        if previous_result_image is None or secondary_image is None:
             print "[ERROR] AppInstance::blend_nth_secondary_image() - primary or secondary image is None"
             return
 
-        mask_size = (primary_image.shape[0], primary_image.shape[1])
+        mask_size = (previous_result_image.shape[0], previous_result_image.shape[1])
         mask_coordinates = (x, y, width, height)
 
+        # Create a mask
         mask = self.image_blender.create_rectangular_mask(mask_size, mask_coordinates)
 
-        result_image = self.image_blender.blend(primary_image, secondary_image, mask)
+        # Blend the previous result with the secondary image
+        new_result_image = self.image_blender.blend(previous_result_image, secondary_image, mask)
 
-        if result_image is None:
+        if new_result_image is None:
+            print "[ERROR] AppInstance::blend_nth_secondary_image() - blend result is None"
             return
 
-        cv2.namedWindow("Blend", cv2.WINDOW_AUTOSIZE)
-        cv2.imshow("Blend", result_image)
-        cv2.imwrite("blended_image.jpg", result_image)
-        cv2.waitKey(0)
+        # Update result image in image source
+        self.image_source.set_result_image(new_result_image)
+
+        if DISPLAY_INTERMEDIATE_RESULTS:
+            window_title = "Intermediate Blending Result"
+            cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
+            cv2.imshow(window_title, new_result_image)
 
 
     def save_result(self, filename):
-        pass
+        result_image = self.image_source.get_result_image()
+
+        window_title = "Final Result"
+        cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
+        cv2.imshow(window_title, result_image)
+        cv2.imwrite(filename, result_image)
 
 
 if __name__ == "__main__":
@@ -83,3 +101,6 @@ if __name__ == "__main__":
 
     app_instance = AppInstance()
     app_instance.run_as_commandline_app(commands)
+
+    # Keep cv windows open until a key is pressed.
+    cv2.waitKey(0)
