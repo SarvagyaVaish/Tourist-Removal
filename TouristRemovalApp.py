@@ -55,6 +55,14 @@ class AppInstance:
 
         result_image = self.image_blender.blend(primary_image, secondary_image, mask)
 
+        if result_image is None:
+            return
+
+        cv2.namedWindow("Blend", cv2.WINDOW_AUTOSIZE)
+        cv2.imshow("Blend", result_image)
+        cv2.imwrite("blended_image.jpg", result_image)
+        cv2.waitKey(0)
+
 
     def save_result(self, filename):
         pass
@@ -63,10 +71,14 @@ class AppInstance:
 if __name__ == "__main__":
 
     commands = [
-        '--cmd load "path/to/folder"',
+        '--cmd load "./test1"',
+        # '--cmd align 0',
+        '--cmd align 1',
         '--cmd align 2',
-        '--cmd blend 2 10 20 120 300',
-        '--cmd save "path/to/result_filename.ext"',
+        # '--cmd blend 0 180 200 100 100',
+        '--cmd blend 1 180 200 100 100',
+        '--cmd blend 2 180 200 100 100',
+        '--cmd save "./test1/result.jpg"',
     ]
 
     app_instance = AppInstance()

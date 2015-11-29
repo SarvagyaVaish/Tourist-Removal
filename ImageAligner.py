@@ -96,4 +96,4 @@ class ImageAligner:
         bottom_right = primary_image.shape[1] if point[0] + secondary_image.shape[1] > primary_image.shape[1] else  point[0] + secondary_image.shape[1]
 
         cropped[top_left - point[1]: top_right - point[1], bottom_left - point[0]: bottom_right - point[0]] = warped[top_left: top_right, bottom_left: bottom_right];
-        return cropped, point
+        return cropped.astype(np.uint8)

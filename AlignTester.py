@@ -4,12 +4,11 @@ import cv2
 
 image_source = ImageSource();
 #Change this to your location
-loaded = image_source.load_images("C:\Users\Joey\workspace\Georgia Tech\comp photo\Tourist-Removal\sources");
+loaded = image_source.load_images("./sources")
 
 if(loaded):
-    output_img, point = ImageAligner().align_image(image_source.primary_image, image_source.secondary_images[0]);
-    cv2.imwrite('original_warp.png', output_img);
-    cv2.imwrite('original_warp.png', output_img);
+    output_img = ImageAligner().align_image(image_source.primary_image, image_source.secondary_images[0]);
+    cv2.imwrite('./sources/original_warp.png', output_img)
 
     output_image = image_source.primary_image
 
@@ -18,4 +17,4 @@ if(loaded):
             if output_img[row][col][0] > 0:
                 output_image[row][col] = output_img[row][col]
 
-    cv2.imwrite('simple_merge.png', output_image);
+    cv2.imwrite('./sources/simple_merge.png', output_image)
