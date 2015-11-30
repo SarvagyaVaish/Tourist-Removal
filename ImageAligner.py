@@ -57,13 +57,18 @@ def warpImagePair(image_1, image_2, homography):
 
     x_min = min(corners[:, 0, 0])
     x_max = max(corners[:, 0, 0])
-
     y_min = min(corners[:, 0, 1])
     y_max = max(corners[:, 0, 1])
 
     translation_matrix = np.array([[1, 0, -1 * x_min], [0, 1, -1 * y_min], [0, 0, 1]])
     translated_homography = np.dot(translation_matrix, homography)
-    return cv2.warpPerspective(image_1, translated_homography, (x_max - x_min, y_max - y_min)), [-1 * x_min, -1 * y_min]
+
+    warped_image_1 = cv2.warpPerspective(image_1, translated_homography, (x_max - x_min, y_max - y_min))
+
+    # Select a sub-region of the warped image that matches image_2's (primary image's) coordinate frame
+    warped_image_1 = warped_image_1[-y_min:-y_min+image_2.shape[0], -x_min:-x_min+image_2.shape[1]]
+
+    return warped_image_1
 
 
 class ImageAligner:
@@ -83,17 +88,6 @@ class ImageAligner:
         """
         secondary_kp, primary_kp, matches = find_matches_between_images(secondary_image, primary_image, 50)
         homography = find_homography(secondary_kp, primary_kp, matches)
-        warped, point = warpImagePair(secondary_image, primary_image, homography)
+        warped = warpImagePair(secondary_image, primary_image, homography)
 
-        # Setting to -1 to help differentiate black and no overlapping.
-        cropped = -1 * np.ones((primary_image.shape[0], primary_image.shape[1], 3))
-        point = map(int, point)
-
-        # Sets the indexes in the cropped and padded to the returned value
-        top_left = point[1]
-        top_right = primary_image.shape[0] if (point[1] + secondary_image.shape[0]) > primary_image.shape[0] else point[1] + secondary_image.shape[0]
-        bottom_left = point[0]
-        bottom_right = primary_image.shape[1] if point[0] + secondary_image.shape[1] > primary_image.shape[1] else  point[0] + secondary_image.shape[1]
-
-        cropped[top_left - point[1]: top_right - point[1], bottom_left - point[0]: bottom_right - point[0]] = warped[top_left: top_right, bottom_left: bottom_right];
-        return cropped.astype(np.uint8)
+        return warped
