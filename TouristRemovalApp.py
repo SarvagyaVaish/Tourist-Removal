@@ -3,8 +3,10 @@ from ImageAligner import ImageAligner
 from ImageBlender import ImageBlender
 from ImageSource import ImageSource
 import cv2
+import os
 
 DISPLAY_INTERMEDIATE_RESULTS = 1
+INTERMEDIATE_RESULTS_FOLDER = "./intermediate-results"
 
 class AppInstance:
     """
@@ -46,6 +48,10 @@ class AppInstance:
             cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
             cv2.imshow(window_title, aligned_image)
 
+            if not os.path.exists(INTERMEDIATE_RESULTS_FOLDER):
+                os.makedirs(INTERMEDIATE_RESULTS_FOLDER)
+            cv2.imwrite(INTERMEDIATE_RESULTS_FOLDER + "/" + window_title + ".jpg", aligned_image)
+
 
     def blend_nth_secondary_image(self, secondary_image_index, x, y, width, height):
         previous_result_image = self.image_source.get_result_image()
@@ -72,9 +78,13 @@ class AppInstance:
         self.image_source.set_result_image(new_result_image)
 
         if DISPLAY_INTERMEDIATE_RESULTS:
-            window_title = "Intermediate Blending Result"
+            window_title = "Intermediate Blending Result (#" + str(secondary_image_index) + ")"
             cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
             cv2.imshow(window_title, new_result_image)
+
+            if not os.path.exists(INTERMEDIATE_RESULTS_FOLDER):
+                os.makedirs(INTERMEDIATE_RESULTS_FOLDER)
+            cv2.imwrite(INTERMEDIATE_RESULTS_FOLDER + "/" + window_title + ".jpg", new_result_image)
 
 
     def save_result(self, filename):
@@ -88,16 +98,29 @@ class AppInstance:
 
 if __name__ == "__main__":
 
+    dir_path = "./sailboat"
     commands = [
-        '--cmd load "./test1"',
-        # '--cmd align 0',
+        '--cmd load "' + dir_path + '"',
+        '--cmd align 0',
+        '--cmd align 1',
+        '--cmd blend 1 510 279 52 74',
+        '--cmd blend 0 554 260 55 68',
+        '--cmd save "' + dir_path + '/result.jpg"',
+    ]
+
+    """
+    # For testing image aligner
+    dir_path = "./test1"
+    commands = [
+        '--cmd load "' + dir_path + '"',
+        '--cmd align 0',
         '--cmd align 1',
         '--cmd align 2',
-        # '--cmd blend 0 180 200 100 100',
-        '--cmd blend 1 180 200 100 100',
-        '--cmd blend 2 180 200 100 100',
-        '--cmd save "./test1/result.jpg"',
+        '--cmd align 3',
+        '--cmd align 4',
+        '--cmd align 5',
     ]
+    """
 
     app_instance = AppInstance()
     app_instance.run_as_commandline_app(commands)
