@@ -34,6 +34,8 @@ class TouristRemovalGui:
         self.button_highlighted_merged = QAction('Show Highlighted Merged Area', self.window)
         self.button_unaltered_primary = QAction('Show Unaltered Primary Image', self.window)
         self.button_merge = QAction('Merge', self.window)
+        self.button_set_primary = QAction('Set New Primary', self.window)
+
         self.button_update_merge = QPushButton('Update Merge Area', self.window)
 
         self.input_x = QLineEdit(self.window)
@@ -80,6 +82,7 @@ class TouristRemovalGui:
         display_menu.addAction(self.build_show_hightlighed_merged_button())
         display_menu.addAction(self.build_show_unaltered_primary_button())
         display_menu.addAction(self.build_show_merged_button())
+        display_menu.addAction(self.build_show_set_primary_button())
 
     def build_import_source_button(self):
         button = QAction('Import Source Folder', self.window)
@@ -103,17 +106,17 @@ class TouristRemovalGui:
         return button
 
     def build_show_hightlighed_primary_button(self):
-        self.button_highlighted.triggered.connect(lambda: self.set_label_image(self.output_highlight))
+        self.button_highlighted.triggered.connect(lambda: self.set_label_image(self.output_highlight, False))
         self.button_highlighted.setEnabled(False)
         return self.button_highlighted
 
     def build_show_hightlighed_merged_button(self):
-        self.button_highlighted_merged.triggered.connect(lambda: self.set_label_image(self.output_highlight_merge))
+        self.button_highlighted_merged.triggered.connect(lambda: self.set_label_image(self.output_highlight_merge, False))
         self.button_highlighted_merged.setEnabled(False)
         return self.button_highlighted_merged
 
     def build_show_unaltered_primary_button(self):
-        self.button_unaltered_primary.triggered.connect(lambda: self.set_label_image(self.primary))
+        self.button_unaltered_primary.triggered.connect(lambda: self.set_label_image(self.primary, False))
         self.button_unaltered_primary.setEnabled(False)
         return self.button_unaltered_primary
 
@@ -121,6 +124,11 @@ class TouristRemovalGui:
         self.button_merge.triggered.connect(self.merge)
         self.button_merge.setEnabled(False)
         return self.button_merge
+
+    def build_show_set_primary_button(self):
+        self.button_set_primary.triggered.connect(self.set_primary)
+        self.button_set_primary.setEnabled(False)
+        return self.button_set_primary
 
     def import_source(self) :
         loaded = self.image_source.load_images(str(QFileDialog.getExistingDirectory(self.window, 'Open Source Folder')))
@@ -182,6 +190,7 @@ class TouristRemovalGui:
         self.button_highlighted_merged.setEnabled(True)
         self.button_unaltered_primary.setEnabled(True)
         self.button_merge.setEnabled(True)
+        self.button_set_primary.setEnabled(True)
 
     def convert_opencv_to_qimage (self, cv_img, show_merge = True):
         img = np.copy(cv_img)
@@ -237,6 +246,11 @@ class TouristRemovalGui:
 
     def save_image(self):
         cv2.imwrite("result.jpg", self.visible_image)
+
+    def set_primary(self):
+        self.primary = self.visible_image
+        self.build_highlight_and_merged(int(self.images_combo.currentText()))
+
 
 if __name__ == "__main__":
     gui = TouristRemovalGui()
