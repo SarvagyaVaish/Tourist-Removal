@@ -204,6 +204,7 @@ class TouristRemovalGui:
 
     def build_highlight_and_merged(self, index):
         align = self.image_aligner.align_image(self.primary, self.image_source.secondary_images[index])
+        self.image_source.set_aligned_secondary_image(align, index)
         self.output_highlight = np.copy(self.primary)
         self.output_highlight_merge = np.copy(self.primary)
 
@@ -231,7 +232,7 @@ class TouristRemovalGui:
 
         mask = self.image_blender.create_rectangular_mask(mask_size, mask_coordinates)
 
-        new_result_image = self.image_blender.blend(self.primary, self.image_source.secondary_images[int(self.images_combo.currentText())], mask)
+        new_result_image = self.image_blender.blend(self.primary, self.image_source.aligned_secondary_images[int(self.images_combo.currentText())], mask)
         self.set_label_image(new_result_image, False)
 
     def save_image(self):
