@@ -151,15 +151,17 @@ class TouristRemovalGui:
     def import_success_handler(self):
         self.scroll_area.setVisible(True)
         shape = self.image_source.primary_image.shape;
-        width = min(shape[1], 800)
-        height = min(shape[0], 800)
-        self.scroll_area.setFixedSize(width, height)
-        self.window.setFixedSize(width, height + 80)
+        width = min(shape[1], 1800)
+        height = min(shape[0], 900)
+        buffer = 2
+        self.scroll_area.setFixedSize(width + buffer, height + buffer)
+        self.window.setFixedSize(width + buffer, height + 80 + buffer)
 
         self.images_combo.setVisible(True)
         for pos in range(len(self.image_source.secondary_images)):
             self.images_combo.addItem(str(pos))
         self.images_combo.move(20, height + 35)
+        self.images_combo.setFixedWidth(50)
 
         print shape
         self.input_x.setVisible(True)
@@ -184,7 +186,8 @@ class TouristRemovalGui:
         self.input_height.setFixedWidth(50)
 
         self.button_update_merge.setVisible(True)
-        self.button_update_merge.move(250, height + 35)
+        self.button_update_merge.move(260, height + 35)
+        self.button_update_merge.setFixedWidth(140)
 
         self.button_highlighted.setEnabled(True)
         self.button_highlighted_merged.setEnabled(True)

@@ -67,6 +67,15 @@ class AppInstance:
         # Create a mask
         mask = self.image_blender.create_rectangular_mask(mask_size, mask_coordinates)
 
+        if DISPLAY_INTERMEDIATE_RESULTS:
+            window_title = "Intermediate Blending Mask (#" + str(secondary_image_index) + ")"
+            cv2.namedWindow(window_title, cv2.WINDOW_AUTOSIZE)
+            cv2.imshow(window_title, mask)
+
+            if not os.path.exists(INTERMEDIATE_RESULTS_FOLDER):
+                os.makedirs(INTERMEDIATE_RESULTS_FOLDER)
+            cv2.imwrite(INTERMEDIATE_RESULTS_FOLDER + "/" + window_title + ".jpg", mask)
+
         # Blend the previous result with the secondary image
         new_result_image = self.image_blender.blend(previous_result_image, secondary_image, mask)
 
@@ -98,13 +107,11 @@ class AppInstance:
 
 if __name__ == "__main__":
 
-    dir_path = "./sailboat"
+    dir_path = "./coffee-table"
     commands = [
         '--cmd load "' + dir_path + '"',
-        '--cmd align 0',
-        '--cmd align 1',
-        '--cmd blend 1 510 279 52 74',
-        '--cmd blend 0 554 260 55 68',
+        '--cmd align 2',
+        '--cmd blend 2 500 630 300 200',
         '--cmd save "' + dir_path + '/result.jpg"',
     ]
 
