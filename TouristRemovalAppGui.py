@@ -218,7 +218,7 @@ class TouristRemovalGui:
         self.output_highlight_merge = np.copy(self.primary)
 
         for row in range(len(align)):
-            for col in range(len(align)):
+            for col in range(len(align[0])):
                 if align[row][col][0] > 0:
                     self.output_highlight_merge[row][col] = align[row][col]
                     self.output_highlight_merge[row, col, 0:1] = 0
@@ -245,7 +245,7 @@ class TouristRemovalGui:
         self.set_label_image(new_result_image, False)
 
     def save_image(self):
-        cv2.imwrite("result.jpg", self.visible_image)
+        cv2.imwrite("result-gui.jpg", self.visible_image)
 
     def set_primary(self):
         self.primary = self.visible_image
